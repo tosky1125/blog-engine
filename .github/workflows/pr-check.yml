@@ -1,0 +1,36 @@
+name: PR Check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  ktlint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Run ktlint
+      uses: ScaCap/action-ktlint@v1
+      with:
+        github_token: ${{ secrets.github_token }}
+        reporter: github-pr-review
+    
+  dependency-check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Run dependency check
+      uses: dependency-check/Dependency-Check_Action@main
+      with:
+        project: 'blog-engine-kotlin'
+        path: '.'
+        format: 'HTML'
+    
+    - name: Upload dependency check results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: dependency-check-report
+        path: reports/
