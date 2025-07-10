@@ -13,11 +13,9 @@ import java.util.Optional
 
 @Repository
 interface PostRepository : JpaRepository<Post, Long> {
-    fun findBySlug(slug: String): Optional<Post>
+    fun findAllByPublishedTrueOrderByPublishedAtDesc(pageable: Pageable): Page<Post>
     
-    fun findAllByIsPublishedTrueOrderByPublishedAtDesc(pageable: Pageable): Page<Post>
-    
-    fun findAllByAuthorAndIsPublishedTrueOrderByPublishedAtDesc(
+    fun findAllByAuthorAndPublishedTrueOrderByPublishedAtDesc(
         author: User,
         pageable: Pageable
     ): Page<Post>
@@ -27,13 +25,13 @@ interface PostRepository : JpaRepository<Post, Long> {
         pageable: Pageable
     ): Page<Post>
     
-    @Query("SELECT p FROM Post p JOIN p.tags t WHERE t.slug = :tagSlug AND p.isPublished = true ORDER BY p.publishedAt DESC")
-    fun findAllByTagSlugAndIsPublishedTrue(
+    @Query("SELECT p FROM Post p JOIN p.tags t WHERE t.slug = :tagSlug AND p.published = true ORDER BY p.publishedAt DESC")
+    fun findAllByTagSlugAndPublishedTrue(
         @Param("tagSlug") tagSlug: String,
         pageable: Pageable
     ): Page<Post>
     
-    @Query("SELECT p FROM Post p WHERE LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(p.content) LIKE LOWER(CONCAT('%', :keyword, '%')) AND p.isPublished = true ORDER BY p.publishedAt DESC")
+    @Query("SELECT p FROM Post p WHERE LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(p.content) LIKE LOWER(CONCAT('%', :keyword, '%')) AND p.published = true ORDER BY p.publishedAt DESC")
     fun searchByKeyword(
         @Param("keyword") keyword: String,
         pageable: Pageable
@@ -45,5 +43,5 @@ interface PostRepository : JpaRepository<Post, Long> {
     
     fun countByAuthor(author: User): Long
     
-    fun countByAuthorAndIsPublishedTrue(author: User): Long
+    fun countByAuthorAndPublishedTrue(author: User): Long
 }
