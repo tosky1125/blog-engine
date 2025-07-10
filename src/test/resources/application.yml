@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:testdb
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL
     driver-class-name: org.h2.Driver
     username: sa
     password: 
@@ -12,14 +12,18 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
         format_sql: true
-    show-sql: false
+    show-sql: true
   
-  redis:
-    host: localhost
-    port: 6379
+  cache:
+    type: none
   
-  elasticsearch:
-    uris: http://localhost:9200
+  data:
+    redis:
+      repositories:
+        enabled: false
+    elasticsearch:
+      repositories:
+        enabled: false
   
   security:
     jwt:
@@ -30,3 +34,4 @@ logging:
   level:
     root: INFO
     com.example.blogenginekotlin: DEBUG
+    org.hibernate.SQL: DEBUG
