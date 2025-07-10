@@ -2,10 +2,9 @@ package com.example.blogenginekotlin.dto.tag
 
 import com.example.blogenginekotlin.entity.Tag
 import java.time.LocalDateTime
-import java.util.UUID
 
 data class TagResponse(
-    val id: UUID,
+    val id: Long,
     val name: String,
     val slug: String,
     val createdAt: LocalDateTime,
