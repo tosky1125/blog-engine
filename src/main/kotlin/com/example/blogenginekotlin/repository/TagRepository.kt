@@ -5,10 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 import java.util.Optional
-import java.util.UUID
 
 @Repository
-interface TagRepository : JpaRepository<Tag, UUID> {
+interface TagRepository : JpaRepository<Tag, Long> {
     fun findByName(name: String): Optional<Tag>
     
     fun findBySlug(slug: String): Optional<Tag>

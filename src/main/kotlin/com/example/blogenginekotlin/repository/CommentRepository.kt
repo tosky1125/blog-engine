@@ -9,18 +9,17 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
-import java.util.UUID
 
 @Repository
-interface CommentRepository : JpaRepository<Comment, UUID> {
+interface CommentRepository : JpaRepository<Comment, Long> {
     fun findAllByPostOrderByCreatedAtDesc(post: Post, pageable: Pageable): Page<Comment>
     
-    fun findAllByPostAndParentCommentIsNullOrderByCreatedAtDesc(
+    fun findAllByPostAndParentIsNullOrderByCreatedAtDesc(
         post: Post,
         pageable: Pageable
     ): Page<Comment>
     
-    fun findAllByParentCommentOrderByCreatedAtAsc(parentComment: Comment): List<Comment>
+    fun findAllByParentOrderByCreatedAtAsc(parent: Comment): List<Comment>
     
     fun findAllByAuthorOrderByCreatedAtDesc(author: User, pageable: Pageable): Page<Comment>
     
@@ -29,7 +28,7 @@ interface CommentRepository : JpaRepository<Comment, UUID> {
     fun countByAuthor(author: User): Long
     
     @Query("SELECT COUNT(c) FROM Comment c WHERE c.post.id = :postId")
-    fun countByPostId(@Param("postId") postId: UUID): Long
+    fun countByPostId(@Param("postId") postId: Long): Long
     
     fun deleteAllByPost(post: Post)
 }

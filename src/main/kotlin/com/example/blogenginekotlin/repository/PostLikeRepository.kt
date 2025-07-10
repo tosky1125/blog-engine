@@ -8,10 +8,9 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 import java.util.Optional
-import java.util.UUID
 
 @Repository
-interface PostLikeRepository : JpaRepository<PostLike, UUID> {
+interface PostLikeRepository : JpaRepository<PostLike, Long> {
     fun findByUserAndPost(user: User, post: Post): Optional<PostLike>
     
     fun existsByUserAndPost(user: User, post: Post): Boolean
@@ -19,7 +18,7 @@ interface PostLikeRepository : JpaRepository<PostLike, UUID> {
     fun countByPost(post: Post): Long
     
     @Query("SELECT COUNT(pl) FROM PostLike pl WHERE pl.post.id = :postId")
-    fun countByPostId(@Param("postId") postId: UUID): Long
+    fun countByPostId(@Param("postId") postId: Long): Long
     
     fun findAllByUser(user: User): List<PostLike>
     

@@ -10,10 +10,9 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 import java.util.Optional
-import java.util.UUID
 
 @Repository
-interface PostRepository : JpaRepository<Post, UUID> {
+interface PostRepository : JpaRepository<Post, Long> {
     fun findBySlug(slug: String): Optional<Post>
     
     fun findAllByIsPublishedTrueOrderByPublishedAtDesc(pageable: Pageable): Page<Post>
@@ -42,7 +41,7 @@ interface PostRepository : JpaRepository<Post, UUID> {
     
     @Modifying
     @Query("UPDATE Post p SET p.viewCount = p.viewCount + 1 WHERE p.id = :postId")
-    fun incrementViewCount(@Param("postId") postId: UUID)
+    fun incrementViewCount(@Param("postId") postId: Long)
     
     fun countByAuthor(author: User): Long
     
