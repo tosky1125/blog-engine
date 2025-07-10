@@ -13,7 +13,7 @@ data class TagResponse(
     companion object {
         fun from(tag: Tag): TagResponse {
             return TagResponse(
-                id = tag.id!!,
+                id = tag.id,
                 name = tag.name,
                 slug = tag.slug,
                 createdAt = tag.createdAt,
