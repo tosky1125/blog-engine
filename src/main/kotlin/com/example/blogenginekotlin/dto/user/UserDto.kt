@@ -1,10 +1,8 @@
 package com.example.blogenginekotlin.dto.user
 
 import java.time.LocalDateTime
-import java.util.UUID
-
 data class UserDto(
-    val id: UUID,
+    val id: Long,
     val username: String,
     val email: String,
     val name: String,

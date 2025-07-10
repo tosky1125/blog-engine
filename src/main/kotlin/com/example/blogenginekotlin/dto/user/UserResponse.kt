@@ -2,10 +2,8 @@ package com.example.blogenginekotlin.dto.user
 
 import com.example.blogenginekotlin.entity.User
 import java.time.LocalDateTime
-import java.util.UUID
-
 data class UserResponse(
-    val id: UUID,
+    val id: Long,
     val username: String,
     val email: String,
     val name: String,
@@ -17,7 +15,7 @@ data class UserResponse(
     companion object {
         fun from(user: User): UserResponse {
             return UserResponse(
-                id = user.id!!,
+                id = user.id,
                 username = user.username,
                 email = user.email,
                 name = user.name,
