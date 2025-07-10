@@ -26,7 +26,7 @@ interface PostRepository : JpaRepository<Post, Long> {
     ): Page<Post>
     
     @Query("SELECT p FROM Post p JOIN p.tags t WHERE t.slug = :tagSlug AND p.published = true ORDER BY p.publishedAt DESC")
-    fun findAllByTagSlugAndIsPublishedTrue(
+    fun findAllByTagSlugAndPublishedTrue(
         @Param("tagSlug") tagSlug: String,
         pageable: Pageable
     ): Page<Post>
