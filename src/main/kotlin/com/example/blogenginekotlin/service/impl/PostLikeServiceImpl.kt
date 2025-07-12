@@ -25,7 +25,7 @@ class PostLikeServiceImpl(
         val post = postRepository.findById(postId)
             .orElseThrow { NoSuchElementException("Post not found with id: $postId") }
 
-        if (!post.isPublished) {
+        if (!post.published) {
             throw IllegalStateException("Cannot like unpublished posts")
         }
 
@@ -40,7 +40,7 @@ class PostLikeServiceImpl(
 
         val savedPostLike = postLikeRepository.save(postLike)
         
-        post.likeCount = postLikeRepository.countByPostId(postId)
+        post.likeCount = postLikeRepository.countByPostId(postId).toInt()
         postRepository.save(post)
 
         return PostLikeDto.from(savedPostLike)
@@ -56,7 +56,7 @@ class PostLikeServiceImpl(
         val post = postRepository.findById(postId)
             .orElseThrow { NoSuchElementException("Post not found with id: $postId") }
         
-        post.likeCount = postLikeRepository.countByPostId(postId)
+        post.likeCount = postLikeRepository.countByPostId(postId).toInt()
         postRepository.save(post)
     }
 

@@ -29,7 +29,7 @@ class CommentServiceImpl(
         val post = postRepository.findById(postId)
             .orElseThrow { NoSuchElementException("Post not found with id: $postId") }
 
-        if (!post.isPublished) {
+        if (!post.published) {
             throw IllegalStateException("Cannot comment on unpublished posts")
         }
 
@@ -51,7 +51,7 @@ class CommentServiceImpl(
         val parentComment = commentRepository.findById(parentCommentId)
             .orElseThrow { NoSuchElementException("Parent comment not found with id: $parentCommentId") }
 
-        if (!parentComment.post.isPublished) {
+        if (!parentComment.post.published) {
             throw IllegalStateException("Cannot reply to comments on unpublished posts")
         }
 
@@ -59,7 +59,7 @@ class CommentServiceImpl(
             content = request.content,
             author = user,
             post = parentComment.post,
-            parentComment = parentComment
+            parent = parentComment
         )
 
         val savedReply = commentRepository.save(reply)
@@ -101,12 +101,12 @@ class CommentServiceImpl(
     }
 
     override fun getCommentsByPost(postId: Long, pageable: Pageable): Page<CommentDto> {
-        return commentRepository.findByPostIdAndParentCommentIsNull(postId, pageable)
+        return commentRepository.findByPostIdAndParentIsNull(postId, pageable)
             .map { CommentDto.from(it) }
     }
 
     override fun getRepliesByComment(commentId: Long, pageable: Pageable): Page<CommentDto> {
-        return commentRepository.findByParentCommentId(commentId, pageable)
+        return commentRepository.findByParentId(commentId, pageable)
             .map { CommentDto.from(it) }
     }
 

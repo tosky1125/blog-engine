@@ -39,11 +39,11 @@ class PostServiceImpl(
         val post = Post(
             title = request.title,
             content = request.content,
-            summary = request.summary,
+            summary = request.summary ?: "",
             coverImageUrl = request.coverImageUrl,
             author = user,
             tags = tags,
-            isPublished = request.isPublished ?: false,
+            published = request.isPublished ?: false,
             publishedAt = if (request.isPublished == true) LocalDateTime.now() else null
         )
 
@@ -58,7 +58,7 @@ class PostServiceImpl(
     }
 
     override fun getPublishedPostById(id: Long): PostDetailDto {
-        val post = postRepository.findByIdAndIsPublishedTrue(id)
+        val post = postRepository.findByIdAndPublishedTrue(id)
             ?: throw NoSuchElementException("Published post not found with id: $id")
         return PostDetailDto.from(post)
     }
@@ -78,13 +78,14 @@ class PostServiceImpl(
         request.coverImageUrl?.let { post.coverImageUrl = it }
 
         request.tagNames?.let { tagNames ->
-            val tags = tagNames.map { tagName ->
+            val newTags = tagNames.map { tagName ->
                 tagRepository.findByName(tagName) ?: tagRepository.save(Tag(
                     name = tagName,
                     slug = Tag.createSlug(tagName)
                 ))
             }.toMutableSet()
-            post.tags = tags
+            post.tags.clear()
+            post.tags.addAll(newTags)
         }
 
         val updatedPost = postRepository.save(post)
@@ -112,11 +113,11 @@ class PostServiceImpl(
             throw IllegalStateException("User $userId is not authorized to publish this post")
         }
 
-        if (post.isPublished) {
+        if (post.published) {
             throw IllegalStateException("Post is already published")
         }
 
-        post.isPublished = true
+        post.published = true
         post.publishedAt = LocalDateTime.now()
 
         val publishedPost = postRepository.save(post)
@@ -132,11 +133,11 @@ class PostServiceImpl(
             throw IllegalStateException("User $userId is not authorized to unpublish this post")
         }
 
-        if (!post.isPublished) {
+        if (!post.published) {
             throw IllegalStateException("Post is already unpublished")
         }
 
-        post.isPublished = false
+        post.published = false
         post.publishedAt = null
 
         val unpublishedPost = postRepository.save(post)

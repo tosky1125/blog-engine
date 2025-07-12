@@ -46,8 +46,8 @@ data class Post(
     @Column(name = "view_count", nullable = false)
     var viewCount: Long = 0,
 
-    @Formula("(SELECT COUNT(l.id) FROM post_likes l WHERE l.post_id = id)")
-    val likeCount: Int = 0,
+    @Column(name = "like_count", nullable = false)
+    var likeCount: Int = 0,
 
     @Formula("(SELECT COUNT(c.id) FROM comments c WHERE c.post_id = id)")
     val commentCount: Int = 0

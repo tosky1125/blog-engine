@@ -44,4 +44,17 @@ interface PostRepository : JpaRepository<Post, Long> {
     fun countByAuthor(author: User): Long
     
     fun countByAuthorAndPublishedTrue(author: User): Long
+    
+    @Query("SELECT p FROM Post p LEFT JOIN FETCH p.author LEFT JOIN FETCH p.tags LEFT JOIN FETCH p.comments WHERE p.id = :id")
+    fun findByIdWithDetails(@Param("id") id: Long): Post?
+    
+    fun findByIdAndPublishedTrue(id: Long): Post?
+    
+    fun findByPublishedTrue(pageable: Pageable): Page<Post>
+    
+    fun findByAuthorId(authorId: Long, pageable: Pageable): Page<Post>
+    
+    fun findByAuthorIdAndPublishedTrue(authorId: Long, pageable: Pageable): Page<Post>
+    
+    fun findByTagsNameAndPublishedTrue(tagName: String, pageable: Pageable): Page<Post>
 }
