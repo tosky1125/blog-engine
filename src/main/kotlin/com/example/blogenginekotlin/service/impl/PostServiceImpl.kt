@@ -149,7 +149,7 @@ class PostServiceImpl(
     }
 
     override fun getPublishedPosts(pageable: Pageable): Page<PostDto> {
-        return postRepository.findAllByPublishedTrueOrderByPublishedAtDesc(pageable).map { PostDto.from(it) }
+        return postRepository.findByPublishedTrue(pageable).map { PostDto.from(it) }
     }
 
     override fun getPostsByUser(userId: Long, pageable: Pageable): Page<PostDto> {
