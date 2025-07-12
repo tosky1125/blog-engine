@@ -7,7 +7,8 @@ import org.springframework.security.core.userdetails.UserDetails
 
 @Entity
 @Table(name = "users")
-data class User(
+class User(
+    @get:JvmName("getUsernameField")
     @Column(nullable = false, unique = true)
     var username: String,
 
@@ -15,7 +16,7 @@ data class User(
     var email: String,
 
     @Column(nullable = false)
-    var password: String,
+    private var password: String,
 
     @Column
     var name: String? = null,
@@ -39,6 +40,10 @@ data class User(
     @OneToMany(mappedBy = "author", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     val comments: MutableList<Comment> = mutableListOf()
 ) : BaseEntity(), UserDetails {
+
+    fun setPassword(password: String) {
+        this.password = password
+    }
 
     override fun getAuthorities(): Collection<GrantedAuthority> {
         return listOf(SimpleGrantedAuthority("ROLE_${role.name}"))

@@ -1,8 +1,8 @@
 package com.example.blogenginekotlin.service.impl
 
 import com.example.blogenginekotlin.dto.UserDto
-import com.example.blogenginekotlin.dto.user.CreateUserRequest
-import com.example.blogenginekotlin.dto.user.UpdateUserRequest
+import com.example.blogenginekotlin.dto.request.UserCreateRequest
+import com.example.blogenginekotlin.dto.request.UserUpdateRequest
 import com.example.blogenginekotlin.entity.User
 import com.example.blogenginekotlin.repository.UserRepository
 import com.example.blogenginekotlin.service.UserService
@@ -20,17 +20,21 @@ class UserServiceImpl(
 ) : UserService {
 
     @Transactional
-    override fun createUser(request: CreateUserRequest): UserDto {
+    override fun createUser(request: UserCreateRequest): UserDto {
+        if (userRepository.existsByUsername(request.username)) {
+            throw IllegalArgumentException("Username ${request.username} already exists")
+        }
         if (userRepository.existsByEmail(request.email)) {
             throw IllegalArgumentException("Email ${request.email} already exists")
         }
 
         val user = User(
+            username = request.username,
             email = request.email,
             password = passwordEncoder.encode(request.password),
             name = request.name,
             bio = request.bio,
-            profileImageUrl = request.profileImageUrl
+            avatarUrl = request.avatarUrl
         )
 
         val savedUser = userRepository.save(user)
@@ -44,69 +48,46 @@ class UserServiceImpl(
     }
 
     override fun getUserByUsername(username: String): UserDto {
-        // In this system, email is used as username
-        return getUserByEmail(username)
+        val user = userRepository.findByUsername(username)
+            ?: throw NoSuchElementException("User not found with username: $username")
+        return UserDto.from(user)
     }
 
     override fun getUserByEmail(email: String): UserDto {
         val user = userRepository.findByEmail(email)
-            .orElseThrow { NoSuchElementException("User not found with email: $email") }
+            ?: throw NoSuchElementException("User not found with email: $email")
         return UserDto.from(user)
     }
 
     @Transactional
-    override fun updateUser(id: Long, request: UpdateUserRequest): UserDto {
+    override fun updateUser(id: Long, request: UserUpdateRequest): UserDto {
         val user = userRepository.findById(id)
             .orElseThrow { NoSuchElementException("User not found with id: $id") }
 
-        // User 엔티티의 필드들은 val로 선언되어 있어서 직접 수정할 수 없습니다.
-        // 새로운 User 객체를 생성해야 합니다.
-        var updatedEmail = user.email
-        var updatedPassword = user.password
-        var updatedName = user.name
-        var updatedBio = user.bio
-        var updatedProfileImageUrl = user.profileImageUrl
+        request.username?.let {
+            if (it != user.username && userRepository.existsByUsername(it)) {
+                throw IllegalArgumentException("Username $it already exists")
+            }
+            user.username = it
+        }
 
         request.email?.let {
             if (it != user.email && userRepository.existsByEmail(it)) {
                 throw IllegalArgumentException("Email $it already exists")
             }
-            updatedEmail = it
+            user.email = it
         }
 
         request.password?.let {
-            updatedPassword = passwordEncoder.encode(it)
+            user.setPassword(passwordEncoder.encode(it))
         }
 
-        request.name?.let { updatedName = it }
-        request.bio?.let { updatedBio = it }
-        request.profileImageUrl?.let { updatedProfileImageUrl = it }
+        request.name?.let { user.name = it }
+        request.bio?.let { user.bio = it }
+        request.avatarUrl?.let { user.avatarUrl = it }
 
-        // 변경사항이 있는 경우에만 업데이트
-        if (updatedEmail != user.email || 
-            updatedPassword != user.password || 
-            updatedName != user.name || 
-            updatedBio != user.bio || 
-            updatedProfileImageUrl != user.profileImageUrl) {
-            
-            val updatedUser = User(
-                email = updatedEmail,
-                password = updatedPassword,
-                name = updatedName,
-                bio = updatedBio,
-                profileImageUrl = updatedProfileImageUrl,
-                role = user.role,
-                enabled = user.enabled
-            ).apply {
-                id = user.id
-                createdAt = user.createdAt
-                updatedAt = user.updatedAt
-            }
-            
-            return UserDto.from(userRepository.save(updatedUser))
-        }
-
-        return UserDto.from(user)
+        val updatedUser = userRepository.save(user)
+        return UserDto.from(updatedUser)
     }
 
     @Transactional
@@ -122,8 +103,7 @@ class UserServiceImpl(
     }
 
     override fun existsByUsername(username: String): Boolean {
-        // In this system, email is used as username
-        return userRepository.existsByEmail(username)
+        return userRepository.existsByUsername(username)
     }
 
     override fun existsByEmail(email: String): Boolean {

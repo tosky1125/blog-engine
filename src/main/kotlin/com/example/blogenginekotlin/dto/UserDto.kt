@@ -5,11 +5,12 @@ import java.time.LocalDateTime
 
 data class UserDto(
     val id: Long,
+    val username: String,
     val email: String,
-    val name: String,
+    val name: String?,
     val bio: String?,
-    val profileImageUrl: String?,
-    val enabled: Boolean,
+    val avatarUrl: String?,
+    val isActive: Boolean,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime?
 ) {
@@ -17,11 +18,12 @@ data class UserDto(
         fun from(user: User): UserDto {
             return UserDto(
                 id = user.id!!,
+                username = user.username,
                 email = user.email,
                 name = user.name,
                 bio = user.bio,
-                profileImageUrl = user.profileImageUrl,
-                enabled = user.enabled,
+                avatarUrl = user.avatarUrl,
+                isActive = user.isActive,
                 createdAt = user.createdAt,
                 updatedAt = user.updatedAt
             )
