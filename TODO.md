@@ -5,9 +5,9 @@
 2. Configure PostgreSQL database and JPA entities
 3. Implement User and Post entities with relationships (including JPA Auditing)
 4. Create DTOs and request/response classes
+5. Implement repositories with Spring Data JPA
 
 ## 📋 High Priority (Pending)
-5. Implement repositories with Spring Data JPA
 6. Create service layer with business logic
 7. Implement REST controllers
 8. Add Spring Security with JWT authentication

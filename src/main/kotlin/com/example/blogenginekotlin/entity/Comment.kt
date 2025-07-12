@@ -21,5 +21,8 @@ data class Comment(
     val parent: Comment? = null,
 
     @OneToMany(mappedBy = "parent", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val replies: MutableList<Comment> = mutableListOf()
+    val replies: MutableList<Comment> = mutableListOf(),
+
+    @Column(nullable = false)
+    var isEdited: Boolean = false
 ) : BaseEntity()

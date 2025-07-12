@@ -1,24 +1,27 @@
-package com.example.blogenginekotlin.dto.user
+package com.example.blogenginekotlin.dto
 
 import com.example.blogenginekotlin.entity.User
 import java.time.LocalDateTime
-data class UserResponse(
+
+data class UserDto(
     val id: Long,
     val email: String,
     val name: String,
-    val bio: String? = null,
-    val profileImageUrl: String? = null,
+    val bio: String?,
+    val profileImageUrl: String?,
+    val enabled: Boolean,
     val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime
+    val updatedAt: LocalDateTime?
 ) {
     companion object {
-        fun from(user: User): UserResponse {
-            return UserResponse(
+        fun from(user: User): UserDto {
+            return UserDto(
                 id = user.id!!,
                 email = user.email,
                 name = user.name,
                 bio = user.bio,
                 profileImageUrl = user.profileImageUrl,
+                enabled = user.enabled,
                 createdAt = user.createdAt,
                 updatedAt = user.updatedAt
             )
