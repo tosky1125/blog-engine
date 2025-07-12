@@ -31,4 +31,10 @@ interface CommentRepository : JpaRepository<Comment, Long> {
     fun countByPostId(@Param("postId") postId: Long): Long
     
     fun deleteAllByPost(post: Post)
+    
+    fun findByPostIdAndParentIsNull(postId: Long, pageable: Pageable): Page<Comment>
+    
+    fun findByParentId(parentId: Long, pageable: Pageable): Page<Comment>
+    
+    fun findByAuthorId(authorId: Long, pageable: Pageable): Page<Comment>
 }

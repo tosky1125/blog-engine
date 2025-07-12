@@ -25,4 +25,11 @@ interface PostLikeRepository : JpaRepository<PostLike, Long> {
     fun deleteByUserAndPost(user: User, post: Post)
     
     fun deleteAllByPost(post: Post)
+    
+    fun existsByUserIdAndPostId(userId: Long, postId: Long): Boolean
+    
+    fun findByUserIdAndPostId(userId: Long, postId: Long): PostLike?
+    
+    @Query("SELECT pl.post.id FROM PostLike pl WHERE pl.user.id = :userId")
+    fun findPostIdsByUserId(@Param("userId") userId: Long): List<Long>
 }

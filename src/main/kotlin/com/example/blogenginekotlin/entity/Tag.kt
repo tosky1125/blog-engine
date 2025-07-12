@@ -9,7 +9,10 @@ data class Tag(
     var name: String,
 
     @Column(name = "slug", nullable = false, unique = true)
-    var slug: String,
+    var slug: String = "",
+
+    @Column(length = 200)
+    var description: String? = null,
 
     @ManyToMany(mappedBy = "tags")
     val posts: MutableSet<Post> = mutableSetOf()
