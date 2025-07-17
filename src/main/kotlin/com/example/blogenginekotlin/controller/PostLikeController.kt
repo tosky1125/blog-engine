@@ -1,9 +1,12 @@
 package com.example.blogenginekotlin.controller
 
 import com.example.blogenginekotlin.dto.PostLikeDto
+import com.example.blogenginekotlin.entity.User
+import com.example.blogenginekotlin.security.CurrentUser
 import com.example.blogenginekotlin.service.PostLikeService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -13,29 +16,32 @@ class PostLikeController(
 ) {
 
     @PostMapping
+    @PreAuthorize("isAuthenticated()")
     fun likePost(
         @PathVariable postId: Long,
-        @RequestHeader("X-User-Id") userId: Long // Temporary - will be replaced with auth
+        @CurrentUser currentUser: User
     ): ResponseEntity<PostLikeDto> {
-        val postLike = postLikeService.likePost(userId, postId)
+        val postLike = postLikeService.likePost(currentUser.id!!, postId)
         return ResponseEntity.status(HttpStatus.CREATED).body(postLike)
     }
 
     @DeleteMapping
+    @PreAuthorize("isAuthenticated()")
     fun unlikePost(
         @PathVariable postId: Long,
-        @RequestHeader("X-User-Id") userId: Long // Temporary - will be replaced with auth
+        @CurrentUser currentUser: User
     ): ResponseEntity<Void> {
-        postLikeService.unlikePost(userId, postId)
+        postLikeService.unlikePost(currentUser.id!!, postId)
         return ResponseEntity.noContent().build()
     }
 
     @GetMapping("/check")
+    @PreAuthorize("isAuthenticated()")
     fun checkIfLiked(
         @PathVariable postId: Long,
-        @RequestHeader("X-User-Id") userId: Long // Temporary - will be replaced with auth
+        @CurrentUser currentUser: User
     ): ResponseEntity<Map<String, Boolean>> {
-        val isLiked = postLikeService.isPostLikedByUser(userId, postId)
+        val isLiked = postLikeService.isPostLikedByUser(currentUser.id!!, postId)
         return ResponseEntity.ok(mapOf("liked" to isLiked))
     }
 

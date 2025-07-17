@@ -4,6 +4,8 @@ import com.example.blogenginekotlin.dto.PostDto
 import com.example.blogenginekotlin.dto.PostDetailDto
 import com.example.blogenginekotlin.dto.request.PostCreateRequest
 import com.example.blogenginekotlin.dto.request.PostUpdateRequest
+import com.example.blogenginekotlin.entity.User
+import com.example.blogenginekotlin.security.CurrentUser
 import com.example.blogenginekotlin.service.PostService
 import jakarta.validation.Valid
 import org.springframework.data.domain.Page
@@ -11,6 +13,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -20,11 +23,12 @@ class PostController(
 ) {
 
     @PostMapping
+    @PreAuthorize("isAuthenticated()")
     fun createPost(
-        @RequestHeader("X-User-Id") userId: Long, // Temporary - will be replaced with auth
+        @CurrentUser currentUser: User,
         @Valid @RequestBody request: PostCreateRequest
     ): ResponseEntity<PostDto> {
-        val post = postService.createPost(userId, request)
+        val post = postService.createPost(currentUser.id!!, request)
         return ResponseEntity.status(HttpStatus.CREATED).body(post)
     }
 
@@ -99,39 +103,43 @@ class PostController(
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     fun updatePost(
         @PathVariable id: Long,
-        @RequestHeader("X-User-Id") userId: Long, // Temporary - will be replaced with auth
+        @CurrentUser currentUser: User,
         @Valid @RequestBody request: PostUpdateRequest
     ): ResponseEntity<PostDto> {
-        val updatedPost = postService.updatePost(id, userId, request)
+        val updatedPost = postService.updatePost(id, currentUser.id!!, request)
         return ResponseEntity.ok(updatedPost)
     }
 
     @PutMapping("/{id}/publish")
+    @PreAuthorize("isAuthenticated()")
     fun publishPost(
         @PathVariable id: Long,
-        @RequestHeader("X-User-Id") userId: Long // Temporary - will be replaced with auth
+        @CurrentUser currentUser: User
     ): ResponseEntity<PostDto> {
-        val publishedPost = postService.publishPost(id, userId)
+        val publishedPost = postService.publishPost(id, currentUser.id!!)
         return ResponseEntity.ok(publishedPost)
     }
 
     @PutMapping("/{id}/unpublish")
+    @PreAuthorize("isAuthenticated()")
     fun unpublishPost(
         @PathVariable id: Long,
-        @RequestHeader("X-User-Id") userId: Long // Temporary - will be replaced with auth
+        @CurrentUser currentUser: User
     ): ResponseEntity<PostDto> {
-        val unpublishedPost = postService.unpublishPost(id, userId)
+        val unpublishedPost = postService.unpublishPost(id, currentUser.id!!)
         return ResponseEntity.ok(unpublishedPost)
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     fun deletePost(
         @PathVariable id: Long,
-        @RequestHeader("X-User-Id") userId: Long // Temporary - will be replaced with auth
+        @CurrentUser currentUser: User
     ): ResponseEntity<Void> {
-        postService.deletePost(id, userId)
+        postService.deletePost(id, currentUser.id!!)
         return ResponseEntity.noContent().build()
     }
 }
