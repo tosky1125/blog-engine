@@ -3,6 +3,8 @@ package com.example.blogenginekotlin.controller
 import com.example.blogenginekotlin.dto.CommentDto
 import com.example.blogenginekotlin.dto.request.CommentCreateRequest
 import com.example.blogenginekotlin.dto.request.CommentUpdateRequest
+import com.example.blogenginekotlin.entity.User
+import com.example.blogenginekotlin.security.CurrentUser
 import com.example.blogenginekotlin.service.CommentService
 import jakarta.validation.Valid
 import org.springframework.data.domain.Page
@@ -10,6 +12,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -19,22 +22,24 @@ class CommentController(
 ) {
 
     @PostMapping("/posts/{postId}")
+    @PreAuthorize("isAuthenticated()")
     fun createComment(
         @PathVariable postId: Long,
-        @RequestHeader("X-User-Id") userId: Long, // Temporary - will be replaced with auth
+        @CurrentUser currentUser: User,
         @Valid @RequestBody request: CommentCreateRequest
     ): ResponseEntity<CommentDto> {
-        val comment = commentService.createComment(userId, postId, request)
+        val comment = commentService.createComment(currentUser.id!!, postId, request)
         return ResponseEntity.status(HttpStatus.CREATED).body(comment)
     }
 
     @PostMapping("/{parentCommentId}/replies")
+    @PreAuthorize("isAuthenticated()")
     fun createReply(
         @PathVariable parentCommentId: Long,
-        @RequestHeader("X-User-Id") userId: Long, // Temporary - will be replaced with auth
+        @CurrentUser currentUser: User,
         @Valid @RequestBody request: CommentCreateRequest
     ): ResponseEntity<CommentDto> {
-        val reply = commentService.createReply(userId, parentCommentId, request)
+        val reply = commentService.createReply(currentUser.id!!, parentCommentId, request)
         return ResponseEntity.status(HttpStatus.CREATED).body(reply)
     }
 
@@ -74,21 +79,23 @@ class CommentController(
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     fun updateComment(
         @PathVariable id: Long,
-        @RequestHeader("X-User-Id") userId: Long, // Temporary - will be replaced with auth
+        @CurrentUser currentUser: User,
         @Valid @RequestBody request: CommentUpdateRequest
     ): ResponseEntity<CommentDto> {
-        val updatedComment = commentService.updateComment(id, userId, request)
+        val updatedComment = commentService.updateComment(id, currentUser.id!!, request)
         return ResponseEntity.ok(updatedComment)
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     fun deleteComment(
         @PathVariable id: Long,
-        @RequestHeader("X-User-Id") userId: Long // Temporary - will be replaced with auth
+        @CurrentUser currentUser: User
     ): ResponseEntity<Void> {
-        commentService.deleteComment(id, userId)
+        commentService.deleteComment(id, currentUser.id!!)
         return ResponseEntity.noContent().build()
     }
 }
